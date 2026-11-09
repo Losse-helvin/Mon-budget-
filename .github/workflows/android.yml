@@ -5,22 +5,54 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   debug:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
+      # The GitHub-hosted runner already has the Android SDK installed.
       - uses: gradle/actions/setup-gradle@v4
-      - run: ./gradlew testDebugUnitTest assembleDebug
+      - name: Tests et compilation
+        shell: bash
+        run: |
+          set -o pipefail
+          ./gradlew --no-daemon testDebugUnitTest assembleDebug 2>&1 | tee "$RUNNER_TEMP/build.log" || {
+            echo '::error title=Échec de compilation::Consulter les dernières lignes du journal dans les annotations.'
+            tail -n 80 "$RUNNER_TEMP/build.log" | while IFS= read -r line; do
+              line="${line//'%'/'%25'}"; line="${line//$'\r'/'%0D'}"; line="${line//$'\n'/'%0A'}"
+              echo "::error::$line"
+            done
+            exit 1
+          }
+      - name: Préparer le ZIP
+        run: |
+          mkdir -p livrables /tmp/mon-budget
+          cp app/build/outputs/apk/debug/app-debug.apk /tmp/mon-budget/Mon-budget-debug.apk
+          cat > /tmp/mon-budget/LISEZ-MOI.txt <<'TEXT'
+          Mon budget — version debug d'essai
+
+          Installez Mon-budget-debug.apk sur Android 8.0 ou supérieur. Autorisez si nécessaire l'installation depuis la source utilisée.
+          Cette version est une base partielle : elle ne comprend pas encore toutes les fonctionnalités du cahier des charges. Elle n'a pas été validée sur un smartphone. Les données restent sur l'appareil et sont effacées à la désinstallation ; l'export et la sauvegarde ne sont pas encore disponibles. Ne l'utilisez pas comme seul registre financier.
+          TEXT
+          (cd /tmp/mon-budget && sha256sum Mon-budget-debug.apk > SHA256SUMS.txt && zip -q "$GITHUB_WORKSPACE/livrables/Mon-budget-debug.zip" Mon-budget-debug.apk LISEZ-MOI.txt SHA256SUMS.txt)
       - uses: actions/upload-artifact@v4
         with:
           name: mon-budget-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: livrables/Mon-budget-debug.zip
           if-no-files-found: error
+      - name: Rendre le ZIP disponible sur la branche de travail
+        if: github.event_name == 'push' && github.ref_name == 'arena/434afbb7-mon-budget'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f livrables/Mon-budget-debug.zip
+          if ! git diff --cached --quiet; then
+            git commit -m 'Ajouter le ZIP APK debug [skip ci]'
+            git push origin HEAD:arena/434afbb7-mon-budget
+          fi
