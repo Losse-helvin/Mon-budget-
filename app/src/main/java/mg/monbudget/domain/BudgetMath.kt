@@ -37,6 +37,14 @@ object BudgetMath {
         transactions.filter { it.type == Types.EXPENSE }.sumOf { it.amount } - transactions.filter { it.type == Types.REFUND }.sumOf { it.amount },
         transactions.filter { it.type == Types.SAVING }.sumOf { it.amount }
     )
+    /** Net expense per calendar day, ending on the supplied date. */
+    fun dailyExpenses(transactions: List<Transaction>, through: LocalDate, days: Int): List<Long> {
+        require(days > 0)
+        return (days - 1 downTo 0).map { offset ->
+            val date = through.minusDays(offset.toLong())
+            totals(within(transactions, date, date)).expense
+        }
+    }
     fun envelope(envelope: Envelope, transactions: List<Transaction>): EnvelopeStatus {
         val incoming = transactions.filter { it.type == Types.TRANSFER && it.destinationId == envelope.id }.sumOf { it.amount }
         val outgoing = transactions.filter { it.type == Types.TRANSFER && it.envelopeId == envelope.id }.sumOf { it.amount }

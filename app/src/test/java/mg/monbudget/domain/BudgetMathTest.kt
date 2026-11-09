@@ -45,4 +45,8 @@ class BudgetMathTest {
         assertEquals(1.0, BudgetMath.envelope(Envelope(1, "Test", 0), listOf(tx(Types.EXPENSE, 10, source = 1))).ratio, 0.0)
         assertEquals(-10L, BudgetMath.envelope(Envelope(1, "Test", 0), listOf(tx(Types.EXPENSE, 10, source = 1))).remaining)
     }
+    @Test fun dailyChartUsesRealNetExpensesAcrossMonthBoundary() {
+        val list = listOf(tx(Types.EXPENSE, 50, "2026-02-28"), tx(Types.REFUND, 10, "2026-02-28"), tx(Types.TRANSFER, 900, "2026-03-01"), tx(Types.SAVING, 100, "2026-03-01"), tx(Types.EXPENSE, 20, "2026-03-01"))
+        assertEquals(listOf(0L, 40L, 20L), BudgetMath.dailyExpenses(list, LocalDate.parse("2026-03-01"), 3))
+    }
 }
