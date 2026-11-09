@@ -1,6 +1,6 @@
 # Mon budget — base Android native
 
-> **État : base partielle, non compilée ni testé sur Android dans l'environnement de développement actuel. Aucun APK n'est livré.** Ce projet ne remplit pas encore tous les modules du cahier des charges et ne doit pas être utilisé comme unique registre de données financières.
+> **État : base partielle.** Les tests unitaires et la compilation de l’APK debug ont réussi sur GitHub Actions. Cette version n’a pas été validée sur un smartphone, ne comprend pas tous les modules demandés et ne doit pas être utilisée comme unique registre de données financières. Le ZIP d’essai est disponible dans `livrables/Mon-budget-debug.zip`.
 
 ## Architecture
 
@@ -26,14 +26,14 @@
 - Création, modification et suppression d'objectifs, suivi par versements liés et simulation mensuelle ; suppression bloquée si des versements les référencent.
 - Thème clair/sombre et modification du revenu prévu. Les budgets et l'objectif préremplis sont modifiables dans leurs onglets.
 
-Ces fonctions restent à **compiler et valider sur appareil ou émulateur** avant de pouvoir garantir leur fonctionnement. Les seuils et le conseil affichés ne remplacent pas le coach complet demandé.
+Ces fonctions restent à **valider sur appareil ou émulateur** avant de pouvoir garantir leur fonctionnement. Les seuils et le conseil affichés ne remplacent pas le coach complet demandé.
 
 ## Ce qui reste à réaliser
 
 - Configuration initiale guidée, graphiques et indicateur de santé, historique détaillé par enveloppe et vues quotidienne/hebdomadaire/mensuelle complètes.
 - Moteur de recommandations complet et estimation de durée d'épargne ; programme pédagogique de 30 leçons et quiz.
 - Rappels et alertes par WorkManager, permissions de notifications ; export CSV/PDF, sauvegarde et restauration JSON sécurisées ; verrouillage PIN et protection des exports.
-- Tests instrumentés, vérification d'accessibilité, compatibilité petits écrans et tests sur appareil ; compilation et vérification APK debug et release signée avec une clé durable. Aucun APK n'est inclus à ce stade.
+- Tests instrumentés, vérification d'accessibilité, compatibilité petits écrans et tests sur appareil ; compilation et vérification d’une release signée avec une clé durable. Le ZIP fourni contient uniquement un APK debug d’essai.
 
 ## Compiler et essayer sur son propre ordinateur
 
@@ -43,7 +43,7 @@ Ces fonctions restent à **compiler et valider sur appareil ou émulateur** avan
 4. Installer l'APK debug depuis Android Studio ou avec `adb install -r app/build/outputs/apk/debug/app-debug.apk`. Android peut demander l'autorisation d'installer depuis cette source. Un APK debug est destiné aux essais, pas à une distribution durable.
 5. Une version release durable doit être générée et signée dans Android Studio via **Build > Generate Signed Bundle / APK** avec un keystore personnel conservé en lieu sûr. Ne jamais committer le keystore ou ses mots de passe. Conserver la même clé pour pouvoir installer les mises à jour. Cette procédure n'a pas été vérifiée ici ; aucune clé ni release signée n'est fournie.
 
-Le workflow GitHub Actions `Vérification Android` lance tests et compilation debug et publie l'APK en artefact **si le job réussit**. Il n'a pas été exécuté dans cet environnement.
+Le workflow GitHub Actions `Vérification Android` lance les tests et la compilation debug, et publie le ZIP en artefact si le job réussit. La compilation et les tests unitaires ont réussi sur GitHub Actions le 9 novembre 2026. Le certificat de signature debug peut changer à chaque compilation : les mises à jour ultérieures peuvent nécessiter une désinstallation et entraîner la perte des données. Une release durable nécessite une clé de signature conservée.
 
 ## Utilisation de la base
 
