@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   debug:
@@ -38,6 +38,8 @@ jobs:
           Mon budget — version debug d'essai
 
           Installez Mon-budget-debug.apk sur Android 8.0 ou supérieur. Autorisez si nécessaire l'installation depuis la source utilisée.
+          Attention : cette version debug peut être signée avec une clé différente de celle d'une version précédente. En cas de refus de mise à jour, la désinstallation efface toutes les données locales et il n'existe pas encore de sauvegarde.
+          
           Cette version est une base partielle : elle ne comprend pas encore toutes les fonctionnalités du cahier des charges. Elle n'a pas été validée sur un smartphone. Les données restent sur l'appareil et sont effacées à la désinstallation ; l'export et la sauvegarde ne sont pas encore disponibles. Ne l'utilisez pas comme seul registre financier.
           TEXT
           (cd /tmp/mon-budget && sha256sum Mon-budget-debug.apk > SHA256SUMS.txt && zip -q "$GITHUB_WORKSPACE/livrables/Mon-budget-debug.zip" Mon-budget-debug.apk LISEZ-MOI.txt SHA256SUMS.txt)
@@ -46,13 +48,3 @@ jobs:
           name: mon-budget-debug
           path: livrables/Mon-budget-debug.zip
           if-no-files-found: error
-      - name: Rendre le ZIP disponible sur la branche de travail
-        if: github.event_name == 'push' && github.ref_name == 'arena/57241e86-mon-budget'
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f livrables/Mon-budget-debug.zip
-          if ! git diff --cached --quiet; then
-            git commit -m 'Ajouter le ZIP APK debug redessiné [skip ci]'
-            git push origin HEAD:arena/57241e86-mon-budget
-          fi

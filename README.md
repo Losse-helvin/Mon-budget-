@@ -1,6 +1,6 @@
 # Mon budget — base Android native
 
-> **État : base partielle.** Les tests unitaires et la compilation de l’APK debug ont réussi sur GitHub Actions. Cette version n’a pas été validée sur un smartphone, ne comprend pas tous les modules demandés et ne doit pas être utilisée comme unique registre de données financières. Le ZIP d’essai est disponible dans `livrables/Mon-budget-debug.zip`.
+> **État : base partielle.** Les tests unitaires et la compilation de l’APK debug ont réussi sur GitHub Actions. Cette version n’a pas été validée sur un smartphone, ne comprend pas tous les modules demandés et ne doit pas être utilisée comme unique registre de données financières. Le ZIP d’essai est disponible dans `livrables/Mon-budget-debug.zip`. L’interface 0.2 reprend les cartes arrondies et le graphique du document de référence ; le graphique utilise les transactions réelles.
 
 ## Architecture
 
@@ -43,7 +43,7 @@ Ces fonctions restent à **valider sur appareil ou émulateur** avant de pouvoir
 4. Installer l'APK debug depuis Android Studio ou avec `adb install -r app/build/outputs/apk/debug/app-debug.apk`. Android peut demander l'autorisation d'installer depuis cette source. Un APK debug est destiné aux essais, pas à une distribution durable.
 5. Une version release durable doit être générée et signée dans Android Studio via **Build > Generate Signed Bundle / APK** avec un keystore personnel conservé en lieu sûr. Ne jamais committer le keystore ou ses mots de passe. Conserver la même clé pour pouvoir installer les mises à jour. Cette procédure n'a pas été vérifiée ici ; aucune clé ni release signée n'est fournie.
 
-Le workflow GitHub Actions `Vérification Android` lance les tests et la compilation debug, et publie le ZIP en artefact si le job réussit. La compilation et les tests unitaires ont réussi sur GitHub Actions le 9 novembre 2026. Le certificat de signature debug peut changer à chaque compilation : les mises à jour ultérieures peuvent nécessiter une désinstallation et entraîner la perte des données. Une release durable nécessite une clé de signature conservée.
+Le workflow GitHub Actions `Vérification Android` lance les tests et la compilation debug, et publie le ZIP en artefact si le job réussit. La compilation et les tests unitaires ont réussi sur GitHub Actions le 9 novembre 2026. **Attention : le certificat de signature debug peut changer à chaque compilation. Cette version peut refuser de se mettre à jour par-dessus l’ancienne. La désinstallation efface toutes les données locales, et la sauvegarde n’est pas encore disponible ; ne désinstallez pas si vous devez conserver vos données.** Une release durable nécessite une clé de signature conservée.
 
 ## Utilisation de la base
 
